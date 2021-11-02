@@ -29,7 +29,7 @@ public class Game {
         boolean runningGame = true;
 
         while(runningGame){
-            
+
             String guessedChar = scanner.nextLine();
 
             if (!isValidUserInput(guessedChar)){
