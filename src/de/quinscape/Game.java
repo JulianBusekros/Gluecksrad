@@ -5,10 +5,9 @@ import java.util.*;
 public class Game {
 
     private final Random r = new Random();
-    private final Scanner s = new Scanner(System.in);
+    private Scanner s = new Scanner(System.in);
     private int currentAttempt;
     private int numberOfGuessedChars;
-    //private List<String> correctLetters;
 
     public void startGame(){
         System.out.println("===Willkommen beim Glücksrad===");
@@ -19,30 +18,37 @@ public class Game {
         boolean runningGame = true;
 
         while(runningGame){
+            
             String guessedChar = s.nextLine();
             currentAttempt++;
             underscoreWord = updateWordWithUnderscores(wordToGuess, guessedChar, underscoreWord);
             System.out.println(underscoreWord);
             System.out.println("Versuch: " + currentAttempt);
 
-            if (currentAttempt >= wordToGuess.length()*2){
-                System.out.println("In " + currentAttempt + " Versuchen haben sie " + numberOfGuessedChars + " richtige Buchstaben erraten.");
-                runningGame = false;
-            }
-            if(underscoreWord.equals(wordToGuess)){
-                System.out.println("In " + currentAttempt + " haben sie das Wort " + wordToGuess + " erraten.");
+            if(isGameOver(wordToGuess, underscoreWord)){
                 runningGame = false;
             }
         }
     }
 
+    public boolean isGameOver(String word, String underscoreWord){
+        if(currentAttempt >= word.length()*2){
+            System.out.println("In " + currentAttempt + " Versuchen haben sie " + numberOfGuessedChars + " richtige Buchstaben erraten.");
+            return true;
+        } else if(underscoreWord.equals(word)){
+            System.out.println("In " + currentAttempt + " Versuchen haben sie das Wort " + word + " erraten.");
+            return true;
+        }
+        return false;
+    }
+
     public String getRandomWord(){
         List<String> words = Arrays.asList(
-                "quinscape",
-                "antarktis",
-                "halloween",
-                "ahornblatt",
-                "hochhaus"
+                "Quinscape",
+                "Antarktis",
+                "Halloween",
+                "Ahornblatt",
+                "Hochhaus"
         );
 
         int randomIndex = r.nextInt(words.size());
@@ -55,16 +61,16 @@ public class Game {
         char guessedChar = guess.charAt(0);
 
         for (int i = 0; i < wordToGuess.length(); i++){
-            if(wordToGuess.charAt(i) == guessedChar){
-                wordWithUnderscores.setCharAt(i, guessedChar);
+            if(wordToGuess.toLowerCase().charAt(i) == guessedChar){
+                if(i == 0){
+                    wordWithUnderscores.setCharAt(i, Character.toUpperCase(guessedChar));
+                } else {
+                    wordWithUnderscores.setCharAt(i, guessedChar);
+
+                }
                 numberOfGuessedChars++;
             }
         }
-
-        /*if (wordToGuess.contains(guess)){
-            wordWithUnderscores.setCharAt(wordToGuess.indexOf(guessedChar), guessedChar);
-        }*/
-
         return wordWithUnderscores.toString();
     }
 
