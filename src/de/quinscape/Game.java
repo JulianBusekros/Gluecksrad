@@ -1,5 +1,7 @@
 package de.quinscape;
 
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.*;
 
 public class Game {
