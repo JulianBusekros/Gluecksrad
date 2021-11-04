@@ -4,14 +4,25 @@ import java.util.*;
 
 public class Game {
 
-    private final Random r = new Random();
-    private Scanner s = new Scanner(System.in);
+    private final Random random = new Random();
+    private final Scanner scanner = new Scanner(System.in);
     private int currentAttempt;
     private int numberOfGuessedChars;
+    List<String> words;
+
+    public Game() {
+        this.words = Arrays.asList(
+                "Quinscape",
+                "Antarktis",
+                "Halloween",
+                "Ahornblatt",
+                "Hochhaus"
+        );
+    }
 
     public void startGame(){
         System.out.println("===Willkommen beim Glücksrad===");
-        String wordToGuess = getRandomWord();
+        String wordToGuess = getRandomWord(words);
         String underscoreWord = wordToGuess.replaceAll("[A-Za-z]", "_");
         System.out.println(underscoreWord);
 
@@ -19,46 +30,52 @@ public class Game {
 
         while(runningGame){
             
-            String guessedChar = s.nextLine();
-            currentAttempt++;
-            underscoreWord = updateWordWithUnderscores(wordToGuess, guessedChar, underscoreWord);
-            System.out.println(underscoreWord);
-            System.out.println("Versuch: " + currentAttempt);
+            String guessedChar = scanner.nextLine();
 
-            if(isGameOver(wordToGuess, underscoreWord)){
-                runningGame = false;
+            if (!isValidUserInput(guessedChar)){
+                outputAttemptsAndWordProgress(underscoreWord);
+                continue;
             }
+            currentAttempt++;
+            underscoreWord = generateWordWithUnderscores(wordToGuess, guessedChar, underscoreWord);
+            outputAttemptsAndWordProgress(underscoreWord);
+
+            runningGame = isGameOver(wordToGuess, underscoreWord);
+
         }
     }
-
-    public boolean isGameOver(String word, String underscoreWord){
-        if(currentAttempt >= word.length()*2){
-            System.out.println("In " + currentAttempt + " Versuchen haben sie " + numberOfGuessedChars + " richtige Buchstaben erraten.");
-            return true;
-        } else if(underscoreWord.equals(word)){
-            System.out.println("In " + currentAttempt + " Versuchen haben sie das Wort " + word + " erraten.");
-            return true;
+    public void outputAttemptsAndWordProgress(String underscoreWord){
+        System.out.println(underscoreWord);
+        System.out.println("Versuch: " + currentAttempt );
+    }
+    public boolean isValidUserInput(String guessedChar){
+        if(guessedChar.length() != 1 || !guessedChar.matches("[A-Za-z]")){
+            System.out.println("Bitte nur einen Buchstaben eingeben!");
+            return false;
         }
-        return false;
+        return true;
     }
 
-    public String getRandomWord(){
-        List<String> words = Arrays.asList(
-                "Quinscape",
-                "Antarktis",
-                "Halloween",
-                "Ahornblatt",
-                "Hochhaus"
-        );
+    public boolean isGameOver(String wordToGuess, String underscoreWord){
+        if(currentAttempt >= wordToGuess.length()*2){
+            System.out.printf("In %s Versuchen haben sie %s richtige Buchstaben erraten. Das richtige Wort ist %s%n"
+                    , currentAttempt, numberOfGuessedChars, wordToGuess);
+            return false;
+        } else if(underscoreWord.equals(wordToGuess)){
+            System.out.printf("In %s Versuchen haben sie das Wort %s erraten.", currentAttempt, wordToGuess);
+            return false;
+        }
+        return true;
+    }
 
-        int randomIndex = r.nextInt(words.size());
-
+    public String getRandomWord(List<String> words){
+        int randomIndex = random.nextInt(words.size());
         return words.get(randomIndex);
     }
 
-    public String updateWordWithUnderscores(String wordToGuess, String guess, String underscoreWord){
+    public String generateWordWithUnderscores(String wordToGuess, String guessedCharacter, String underscoreWord){
         StringBuilder wordWithUnderscores = new StringBuilder(underscoreWord);
-        char guessedChar = guess.charAt(0);
+        char guessedChar = guessedCharacter.charAt(0);
 
         for (int i = 0; i < wordToGuess.length(); i++){
             if(wordToGuess.toLowerCase().charAt(i) == guessedChar){
