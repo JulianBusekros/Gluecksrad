@@ -13,13 +13,17 @@ public class Game {
     List<String> words;
 
     public Game() {
-        this.words = Arrays.asList(
-                "Quinscape",
-                "Antarktis",
-                "Halloween",
-                "Ahornblatt",
-                "Hochhaus"
-        );
+        Scanner scanner;
+        words = new ArrayList<>();
+
+        try{
+            scanner = new Scanner(new FileReader("words.txt"));
+            while(scanner.hasNextLine()){
+                words.add(scanner.nextLine());
+            }
+        }catch(IOException e){
+            e.printStackTrace();
+        }
     }
 
     public void startGame(){
