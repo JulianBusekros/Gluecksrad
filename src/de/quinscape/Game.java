@@ -85,7 +85,6 @@ public class Game {
                     wordWithUnderscores.setCharAt(i, Character.toUpperCase(guessedChar));
                 } else {
                     wordWithUnderscores.setCharAt(i, guessedChar);
-
                 }
                 numberOfGuessedChars++;
             }
