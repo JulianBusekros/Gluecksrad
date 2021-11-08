@@ -8,8 +8,6 @@ public class Game {
 
     private final Random random = new Random();
     private final Scanner scanner = new Scanner(System.in);
-    private int currentAttempt;
-    private int numberOfGuessedChars;
     List<String> words;
 
     public Game() {
@@ -27,48 +25,42 @@ public class Game {
     }
 
     public void startGame(){
-        System.out.println("===Willkommen beim Glücksrad===");
-        String wordToGuess = getRandomWord(words);
-        String underscoreWord = wordToGuess.replaceAll("[A-Za-z]", "_");
-        System.out.println(underscoreWord);
+        printGreetings();
+        int amountOfPlayers = scanner.nextInt();
+        scanner.nextLine();
+        int counter = 0;
 
-        boolean runningGame = true;
+        while(counter < amountOfPlayers) {
+            System.out.printf("Spieler %s Name: ", counter + 1);
+            Player player = new Player(scanner.nextLine());
+            player.setWordToGuess(getRandomWord(words));
+            player.setUnderscoreWord(player.getWordToGuess().replaceAll("[A-Za-z]", "_"));
+            System.out.println(player.getUnderscoreWord());
 
-        while(runningGame){
+            boolean runningGame = true;
 
-            String guessedChar = scanner.nextLine();
+            while (runningGame) {
 
-            if (!isValidUserInput(guessedChar)){
-                outputAttemptsAndWordProgress(underscoreWord);
-                continue;
+                String guessedChar = scanner.nextLine();
+
+                if (!isValidUserInput(guessedChar)) {
+                    player.outputAttemptsAndWordProgress();
+                    continue;
+                }
+                player.increaseCurrentAttempts();
+                player.generateWordWithUnderscores(guessedChar);
+                player.outputAttemptsAndWordProgress();
+
+                runningGame = player.isGameOver();
+
             }
-            currentAttempt++;
-            underscoreWord = generateWordWithUnderscores(wordToGuess, guessedChar, underscoreWord);
-            outputAttemptsAndWordProgress(underscoreWord);
-
-            runningGame = isGameOver(wordToGuess, underscoreWord);
-
+            counter++;
         }
     }
-    public void outputAttemptsAndWordProgress(String underscoreWord){
-        System.out.println(underscoreWord);
-        System.out.println("Versuch: " + currentAttempt );
-    }
+
     public boolean isValidUserInput(String guessedChar){
         if(guessedChar.length() != 1 || !guessedChar.matches("[A-Za-z]")){
             System.out.println("Bitte nur einen Buchstaben eingeben!");
-            return false;
-        }
-        return true;
-    }
-
-    public boolean isGameOver(String wordToGuess, String underscoreWord){
-        if(currentAttempt >= wordToGuess.length()*2){
-            System.out.printf("In %s Versuchen haben sie %s richtige Buchstaben erraten. Das richtige Wort ist %s%n"
-                    , currentAttempt, numberOfGuessedChars, wordToGuess);
-            return false;
-        } else if(underscoreWord.equals(wordToGuess)){
-            System.out.printf("In %s Versuchen haben sie das Wort %s erraten.", currentAttempt, wordToGuess);
             return false;
         }
         return true;
@@ -79,23 +71,9 @@ public class Game {
         return words.get(randomIndex);
     }
 
-    public String generateWordWithUnderscores(String wordToGuess, String guessedCharacter, String underscoreWord){
-        StringBuilder wordWithUnderscores = new StringBuilder(underscoreWord);
-        char guessedChar = guessedCharacter.charAt(0);
-
-        for (int i = 0; i < wordToGuess.length(); i++){
-            if(wordToGuess.toLowerCase().charAt(i) == guessedChar){
-                if(i == 0){
-                    wordWithUnderscores.setCharAt(i, Character.toUpperCase(guessedChar));
-                } else {
-                    wordWithUnderscores.setCharAt(i, guessedChar);
-                }
-                numberOfGuessedChars++;
-            }
-        }
-        return wordWithUnderscores.toString();
+    public void printGreetings(){
+        System.out.println("===Willkommen beim Glücksrad===");
+        System.out.println("Geben Sie die Anzahl der Spieler ein:");
     }
-
-
 
 }
