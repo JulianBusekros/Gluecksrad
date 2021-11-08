@@ -1,5 +1,7 @@
 package de.quinscape;
 
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.*;
 
 public class Game {
@@ -11,13 +13,17 @@ public class Game {
     List<String> words;
 
     public Game() {
-        this.words = Arrays.asList(
-                "Quinscape",
-                "Antarktis",
-                "Halloween",
-                "Ahornblatt",
-                "Hochhaus"
-        );
+        Scanner scanner;
+        words = new ArrayList<>();
+
+        try{
+            scanner = new Scanner(new FileReader("words.txt"));
+            while(scanner.hasNextLine()){
+                words.add(scanner.nextLine());
+            }
+        }catch(IOException e){
+            e.printStackTrace();
+        }
     }
 
     public void startGame(){
@@ -29,7 +35,7 @@ public class Game {
         boolean runningGame = true;
 
         while(runningGame){
-            
+
             String guessedChar = scanner.nextLine();
 
             if (!isValidUserInput(guessedChar)){
@@ -83,7 +89,6 @@ public class Game {
                     wordWithUnderscores.setCharAt(i, Character.toUpperCase(guessedChar));
                 } else {
                     wordWithUnderscores.setCharAt(i, guessedChar);
-
                 }
                 numberOfGuessedChars++;
             }
