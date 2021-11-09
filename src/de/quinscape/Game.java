@@ -8,6 +8,7 @@ public class Game {
 
     private final Random random = new Random();
     private final Scanner scanner = new Scanner(System.in);
+    private final Player player = new Player();
     List<String> words;
 
     public Game() {
@@ -26,38 +27,26 @@ public class Game {
 
     public void startGame(){
         printGreetings();
-        int amountOfPlayers = scanner.nextInt();
-        scanner.nextLine();
-        int counter = 0;
+        setPlayerVariables();
 
+        boolean runningGame = true;
 
-        while(counter < amountOfPlayers) {
-            System.out.printf("Spieler %s Name: ", counter + 1);
-            Player player = new Player(scanner.nextLine());
-            player.setWordToGuess(getRandomWord(words));
-            player.setUnderscoreWord(player.getWordToGuess().replaceAll("[A-Za-z]", "_"));
-            System.out.println(player.getUnderscoreWord());
+        while (runningGame) {
 
-            boolean runningGame = true;
+            String guessedChar = scanner.nextLine();
 
-            while (runningGame) {
-
-                String guessedChar = scanner.nextLine();
-
-                if (!isValidUserInput(guessedChar)) {
-                    player.outputAttemptsAndWordProgress();
-                    continue;
-                }
-                player.increaseCurrentAttempts();
-                player.generateWordWithUnderscores(guessedChar);
-                player.outputAttemptsAndWordProgress();
-
-                runningGame = player.isGameOver();
-
+            if (!isValidUserInput(guessedChar)) {
+                outputAttemptsAndWordProgress();
+                continue;
             }
-            counter++;
+            player.increaseCurrentAttempts();
+            player.setUnderscoreWord(generateWordWithUnderscores(guessedChar));
+            outputAttemptsAndWordProgress();
+
+            runningGame = isGameOver();
+            }
         }
-    }
+
 
     public boolean isValidUserInput(String guessedChar){
         if(guessedChar.length() != 1 || !guessedChar.matches("[A-Za-z]")){
@@ -67,6 +56,14 @@ public class Game {
         return true;
     }
 
+    public void setPlayerVariables(){
+        player.setPlayerName(scanner.nextLine());
+        System.out.println("Hallo " + player.getPlayerName());
+        player.setWordToGuess(getRandomWord(words));
+        player.setUnderscoreWord(player.getWordToGuess().replaceAll("[A-Za-z]", "_"));
+        System.out.println(player.getUnderscoreWord());
+    }
+
     public String getRandomWord(List<String> words){
         int randomIndex = random.nextInt(words.size());
         return words.get(randomIndex);
@@ -74,7 +71,42 @@ public class Game {
 
     public void printGreetings(){
         System.out.println("===Willkommen beim Glücksrad===");
-        System.out.println("Geben Sie die Anzahl der Spieler ein:");
+        System.out.println("Spieler Name: ");
+
+    }
+
+    public void outputAttemptsAndWordProgress(){
+        System.out.println(player.getUnderscoreWord());
+        System.out.println("Versuch: " + player.getCurrentAttempt());
+    }
+
+    public boolean isGameOver(){
+        if(player.getCurrentAttempt() >= player.getWordToGuess().length()*2){
+            System.out.printf("Vielleicht mehr Glück beim nächsten Mal %s. \nIn %s Versuchen haben sie %s richtige Buchstaben erraten. Das richtige Wort ist %s%n \n"
+                    ,player.getPlayerName(), player.getCurrentAttempt(), player.getNumberOfGuessedChars(), player.getWordToGuess());
+            return false;
+        } else if(player.getUnderscoreWord().equals(player.getWordToGuess())){
+            System.out.printf("==Herzlichen Glückwunsch %s== \nIn %s Versuchen haben sie das Wort %s erraten. \n", player.getPlayerName(), player.getCurrentAttempt(), player.getWordToGuess());
+            return false;
+        }
+        return true;
+    }
+
+    public String generateWordWithUnderscores(String guessedCharacter){
+        StringBuilder wordWithUnderscores = new StringBuilder(player.getUnderscoreWord());
+        char guessedChar = guessedCharacter.charAt(0);
+
+        for (int i = 0; i < player.getWordToGuess().length(); i++){
+            if(player.getWordToGuess().toLowerCase().charAt(i) == guessedChar) {
+                if (i == 0) {
+                    wordWithUnderscores.setCharAt(i, Character.toUpperCase(guessedChar));
+                } else {
+                    wordWithUnderscores.setCharAt(i, guessedChar);
+                }
+                player.increaseNumberOfGuessedChars();
+            }
+        }
+        return wordWithUnderscores.toString();
     }
 
 
