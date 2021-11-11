@@ -8,8 +8,7 @@ public class Game {
 
     private final Random random = new Random();
     private final Scanner scanner = new Scanner(System.in);
-    private int currentAttempt;
-    private int numberOfGuessedChars;
+    private final Player player = new Player("default");
     List<String> words;
 
     public Game() {
@@ -27,33 +26,28 @@ public class Game {
     }
 
     public void startGame(){
-        System.out.println("===Willkommen beim Glücksrad===");
-        String wordToGuess = getRandomWord(words);
-        String underscoreWord = wordToGuess.replaceAll("[A-Za-z]", "_");
-        System.out.println(underscoreWord);
+        printGreetings();
+        createPlayer();
 
         boolean runningGame = true;
 
-        while(runningGame){
+        while (runningGame) {
 
             String guessedChar = scanner.nextLine();
 
-            if (!isValidUserInput(guessedChar)){
-                outputAttemptsAndWordProgress(underscoreWord);
+            if (!isValidUserInput(guessedChar)) {
+                printAttemptsAndWordProgress();
                 continue;
             }
-            currentAttempt++;
-            underscoreWord = generateWordWithUnderscores(wordToGuess, guessedChar, underscoreWord);
-            outputAttemptsAndWordProgress(underscoreWord);
+            player.increaseCurrentAttempts();
+            player.setUnderscoreWord(generateWordWithUnderscores(guessedChar));
+            printAttemptsAndWordProgress();
 
-            runningGame = isGameOver(wordToGuess, underscoreWord);
-
+            runningGame = isGameOver();
+            }
         }
-    }
-    public void outputAttemptsAndWordProgress(String underscoreWord){
-        System.out.println(underscoreWord);
-        System.out.println("Versuch: " + currentAttempt );
-    }
+
+
     public boolean isValidUserInput(String guessedChar){
         if(guessedChar.length() != 1 || !guessedChar.matches("[A-Za-z]")){
             System.out.println("Bitte nur einen Buchstaben eingeben!");
@@ -62,16 +56,12 @@ public class Game {
         return true;
     }
 
-    public boolean isGameOver(String wordToGuess, String underscoreWord){
-        if(currentAttempt >= wordToGuess.length()*2){
-            System.out.printf("In %s Versuchen haben sie %s richtige Buchstaben erraten. Das richtige Wort ist %s%n"
-                    , currentAttempt, numberOfGuessedChars, wordToGuess);
-            return false;
-        } else if(underscoreWord.equals(wordToGuess)){
-            System.out.printf("In %s Versuchen haben sie das Wort %s erraten.", currentAttempt, wordToGuess);
-            return false;
-        }
-        return true;
+    public void createPlayer(){
+        player.setPlayerName(scanner.nextLine());
+        System.out.println("Hallo " + player.getPlayerName());
+        player.setWordToGuess(getRandomWord(words));
+        player.setUnderscoreWord(player.getWordToGuess().replaceAll("[A-Za-z]", "_"));
+        System.out.println(player.getUnderscoreWord());
     }
 
     public String getRandomWord(List<String> words){
@@ -79,18 +69,41 @@ public class Game {
         return words.get(randomIndex);
     }
 
-    public String generateWordWithUnderscores(String wordToGuess, String guessedCharacter, String underscoreWord){
-        StringBuilder wordWithUnderscores = new StringBuilder(underscoreWord);
+    public void printGreetings(){
+        System.out.println("===Willkommen beim Glücksrad===");
+        System.out.println("Spieler Name: ");
+
+    }
+
+    public void printAttemptsAndWordProgress(){
+        System.out.println(player.getUnderscoreWord());
+        System.out.println("Versuch: " + player.getCurrentAttempt());
+    }
+
+    public boolean isGameOver(){
+        if(player.getCurrentAttempt() >= player.getWordToGuess().length()*2){
+            System.out.printf("Vielleicht mehr Glück beim nächsten Mal %s. \nIn %s Versuchen haben sie %s richtige Buchstaben erraten. Das richtige Wort ist %s%n \n"
+                    ,player.getPlayerName(), player.getCurrentAttempt(), player.getNumberOfGuessedChars(), player.getWordToGuess());
+            return false;
+        } else if(player.getUnderscoreWord().equals(player.getWordToGuess())){
+            System.out.printf("==Herzlichen Glückwunsch %s== \nIn %s Versuchen haben sie das Wort %s erraten. \n", player.getPlayerName(), player.getCurrentAttempt(), player.getWordToGuess());
+            return false;
+        }
+        return true;
+    }
+
+    public String generateWordWithUnderscores(String guessedCharacter){
+        StringBuilder wordWithUnderscores = new StringBuilder(player.getUnderscoreWord());
         char guessedChar = guessedCharacter.charAt(0);
 
-        for (int i = 0; i < wordToGuess.length(); i++){
-            if(wordToGuess.toLowerCase().charAt(i) == guessedChar){
-                if(i == 0){
+        for (int i = 0; i < player.getWordToGuess().length(); i++){
+            if(player.getWordToGuess().toLowerCase().charAt(i) == guessedChar) {
+                if (i == 0) {
                     wordWithUnderscores.setCharAt(i, Character.toUpperCase(guessedChar));
                 } else {
                     wordWithUnderscores.setCharAt(i, guessedChar);
                 }
-                numberOfGuessedChars++;
+                player.increaseNumberOfGuessedChars();
             }
         }
         return wordWithUnderscores.toString();
