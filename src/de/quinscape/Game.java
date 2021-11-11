@@ -8,7 +8,7 @@ public class Game {
 
     private final Random random = new Random();
     private final Scanner scanner = new Scanner(System.in);
-    private final Player player = new Player();
+    private final Player player = new Player("default");
     List<String> words;
 
     public Game() {
@@ -27,7 +27,7 @@ public class Game {
 
     public void startGame(){
         printGreetings();
-        setPlayerVariables();
+        createPlayer();
 
         boolean runningGame = true;
 
@@ -36,12 +36,12 @@ public class Game {
             String guessedChar = scanner.nextLine();
 
             if (!isValidUserInput(guessedChar)) {
-                outputAttemptsAndWordProgress();
+                printAttemptsAndWordProgress();
                 continue;
             }
             player.increaseCurrentAttempts();
             player.setUnderscoreWord(generateWordWithUnderscores(guessedChar));
-            outputAttemptsAndWordProgress();
+            printAttemptsAndWordProgress();
 
             runningGame = isGameOver();
             }
@@ -56,7 +56,7 @@ public class Game {
         return true;
     }
 
-    public void setPlayerVariables(){
+    public void createPlayer(){
         player.setPlayerName(scanner.nextLine());
         System.out.println("Hallo " + player.getPlayerName());
         player.setWordToGuess(getRandomWord(words));
@@ -75,7 +75,7 @@ public class Game {
 
     }
 
-    public void outputAttemptsAndWordProgress(){
+    public void printAttemptsAndWordProgress(){
         System.out.println(player.getUnderscoreWord());
         System.out.println("Versuch: " + player.getCurrentAttempt());
     }

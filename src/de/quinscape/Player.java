@@ -6,6 +6,10 @@ package de.quinscape;
         private String wordToGuess;
         private String underscoreWord;
 
+        public Player(String playerName) {
+            this.playerName = playerName;
+        }
+
         public void setPlayerName(String playerName) {
             this.playerName = playerName;
         }
